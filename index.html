@@ -1,3 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Marzban WARP Configurator - TAwR00T</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #10b981;
+      --background: #0f0f23;
+      --surface: #1a1a2e;
+      --surface-light: #16213e;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .background-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      text-align: center;
+      padding: 2rem 0 3rem;
+      background: var(--gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .github-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .github-link:hover {
+      background: var(--surface-light);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem 2rem;
+      min-width: 0;
+    }
+
+    .panel {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .panel:hover {
+      border-color: var(--primary);
+      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
+    }
+
+    .panel-header {
+      padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .panel-title i {
+      font-size: 1.5rem;
+    }
+
+    .panel-content {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-display {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--surface-light);
+      border: 2px dashed var(--border);
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-display:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .file-input-display.has-file {
+      border-style: solid;
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    .file-icon {
+      font-size: 1.25rem;
+      margin-right: 0.75rem;
+      opacity: 0.7;
+    }
+
+    .file-text {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem 1rem;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+      transform: translateY(-2px);
+    }
+
+    .preview-container {
+      height: 500px;
+      position: relative;
+      min-width: 0;
+    }
+
+    .preview-content {
+      width: 100%;
+      height: 100%;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 1rem;
+      white-space: pre;
+      overflow: auto;
+      color: var(--text);
+      line-height: 1.5;
+      word-wrap: break-word;
+      word-break: break-all;
+      scroll-behavior: smooth;
+    }
+
+    .preview-content::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .preview-content::-webkit-scrollbar-track {
+      background: var(--surface);
+      border-radius: 4px;
+    }
+
+    .preview-content::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .preview-content::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .preview-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-success {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .routing-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .routing-option {
+      padding: 0.75rem;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .routing-option.active {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .domains-section {
+      margin-top: 1rem;
+      opacity: 0.5;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .domains-section.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .footer-link {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--primary-dark);
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .routing-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 1rem 2rem;
+      }
+      
+      .github-links {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .json-syntax-highlight {
+      color: var(--text);
+    }
+
+    .json-key {
+      color: #7dd3fc;
+    }
+
+    .json-string {
+      color: #86efac;
+    }
+
+    .json-number {
+      color: #fbbf24;
+    }
+
+    .json-boolean {
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-pattern"></div>
+  
+  <header class="header">
+    <h1><i class="fas fa-network-wired"></i> Marzban WARP Configurator</h1>
+    <p>Professional configuration tool for Marzban with WARP outbound routing</p>
+    <div class="github-links">
+      <a href="https://github.com/TAwR00T/marz-warp" class="github-link" target="_blank">
+        <i class="fab fa-github"></i>
+        Project Repository
+      </a>
+      <a href="https://github.com/TAwR00T" class="github-link" target="_blank">
+        <i class="fab fa-github"></i>
+        TAwR00T Profile
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Configuration Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i class="fas fa-cogs"></i>
+          Configuration Settings
+        </div>
+      </div>
+      <div class="panel-content">
+        <div class="form-group">
+          <label class="form-label">Core Configuration File</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="coreFile" class="file-input" accept=".json">
+            <div class="file-input-display" id="coreFileDisplay">
+              <i class="fas fa-file-code file-icon"></i>
+              <span class="file-text">Choose core settings JSON file...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">WARP Outbound Configuration</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="outboundFile" class="file-input" accept=".json">
+            <div class="file-input-display" id="outboundFileDisplay">
+              <i class="fas fa-file-export file-icon"></i>
+              <span class="file-text">Choose warp_outbound.json file...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Routing Configuration</label>
+          <div class="routing-options">
+            <div class="routing-option active" data-mode="all">
+              <i class="fas fa-globe"></i><br>
+              Route All Traffic
+            </div>
+            <div class="routing-option" data-mode="custom">
+              <i class="fas fa-filter"></i><br>
+              Custom Domains Only
+            </div>
+          </div>
+        </div>
+
+        <div class="domains-section" id="domainsSection">
+          <div class="form-group">
+            <label class="form-label">Custom Domains</label>
+            <textarea 
+              id="customDomains" 
+              class="form-textarea"
+              placeholder="Enter domains, one per line:&#10;openai.com&#10;google.com&#10;netflix.com"
+            ></textarea>
+            <small style="color: var(--text-muted); font-size: 0.85rem;">
+              Enter one domain per line. Supports both domain names and geosite entries.
+            </small>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="generateBtn">
+          <i class="fas fa-magic"></i>
+          Generate Configuration
+        </button>
+      </div>
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i class="fas fa-eye"></i>
+          Live Preview
+          <div style="margin-left: auto;">
+            <span class="status-indicator status-pending" id="statusIndicator">
+              <i class="fas fa-clock"></i>
+              Ready
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div class="preview-container">
+          <div class="preview-content" id="preview">
+            <div class="preview-placeholder">
+              <i class="fas fa-code"></i>
+              <h3>Configuration Preview</h3>
+              <p>Upload files and configure settings to see the generated JSON output</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-success" id="copyBtn" style="margin-top: 1rem; display: none;">
+          <i class="fas fa-copy"></i>
+          Copy to Clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Built with ❤️ by <strong style="color: var(--primary);">TAwR00T</strong></p>
+    <div class="footer-links">
+      <a href="https://github.com/TAwR00T" class="footer-link">GitHub Profile</a>
+      <a href="https://github.com/TAwR00T/marz-warp" class="footer-link">Project Repository</a>
+    </div>
+  </footer>
+
+  <script>
+    let coreData = null;
+    let outboundData = null;
+    let routingMode = 'all';
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      updateRoutingMode();
+    });
+
+    function setupEventListeners() {
+      // File input handlers
+      document.getElementById('coreFile').addEventListener('change', handleCoreFile);
+      document.getElementById('outboundFile').addEventListener('change', handleOutboundFile);
+      
+      // Routing mode handlers
+      document.querySelectorAll('.routing-option').forEach(option => {
+        option.addEventListener('click', handleRoutingModeChange);
+      });
+      
+      // Domain input handler for live updates
+      document.getElementById('customDomains').addEventListener('input', generateLivePreview);
+      
+      // Generate button
+      document.getElementById('generateBtn').addEventListener('click', generateConfiguration);
+      
+      // Copy button
+      document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+    }
+
+    async function handleCoreFile(event) {
+      const file = event.target.files[0];
+      const display = document.getElementById('coreFileDisplay');
+      
+      if (file) {
+        try {
+          const text = await file.text();
+          coreData = JSON.parse(text);
+          
+          display.classList.add('has-file');
+          display.querySelector('.file-text').textContent = `✓ ${file.name} (${formatFileSize(file.size)})`;
+          display.querySelector('.file-icon').className = 'fas fa-check-circle file-icon';
+          
+          generateLivePreview();
+        } catch (error) {
+          showError('Invalid JSON in core configuration file');
+          coreData = null;
+        }
+      } else {
+        resetFileDisplay(display, 'Choose core settings JSON file...');
+        coreData = null;
+      }
+    }
+
+    async function handleOutboundFile(event) {
+      const file = event.target.files[0];
+      const display = document.getElementById('outboundFileDisplay');
+      
+      if (file) {
+        try {
+          const text = await file.text();
+          outboundData = JSON.parse(text);
+          
+          display.classList.add('has-file');
+          display.querySelector('.file-text').textContent = `✓ ${file.name} (${formatFileSize(file.size)})`;
+          display.querySelector('.file-icon').className = 'fas fa-check-circle file-icon';
+          
+          generateLivePreview();
+        } catch (error) {
+          showError('Invalid JSON in outbound configuration file');
+          outboundData = null;
+        }
+      } else {
+        resetFileDisplay(display, 'Choose warp_outbound.json file...');
+        outboundData = null;
+      }
+    }
+
+    function handleRoutingModeChange(event) {
+      document.querySelectorAll('.routing-option').forEach(opt => opt.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      
+      routingMode = event.currentTarget.dataset.mode;
+      updateRoutingMode();
+      generateLivePreview();
+    }
+
+    function updateRoutingMode() {
+      const domainsSection = document.getElementById('domainsSection');
+      if (routingMode === 'custom') {
+        domainsSection.classList.add('active');
+      } else {
+        domainsSection.classList.remove('active');
+      }
+    }
+
+    function generateLivePreview() {
+      if (!coreData || !outboundData) {
+        updateStatus('pending', 'Waiting for files');
+        return;
+      }
+
+      generateConfiguration(true);
+    }
+
+    function generateConfiguration(isLivePreview = false) {
+      if (!coreData || !outboundData) {
+        if (!isLivePreview) {
+          showError('Please upload both configuration files');
+        }
+        return;
+      }
+
+      try {
+        // Clone the core data to avoid mutating the original
+        const config = JSON.parse(JSON.stringify(coreData));
+        
+        // Ensure outbounds array exists
+        config.outbounds = config.outbounds || [];
+        
+        // Add WARP outbound at the beginning (ensuring it has the "warp" tag)
+        const warpOutbound = JSON.parse(JSON.stringify(outboundData));
+        warpOutbound.tag = "warp"; // Ensure the tag is set to "warp"
+        config.outbounds.unshift(warpOutbound);
+        
 // Only add routing if we're in "custom" mode
         if (routingMode === 'custom') {
           // Ensure routing exists
@@ -32,3 +749,104 @@
         }
         // For "all traffic" mode, no routing rules are added
         // WARP outbound will be used as default since it's first in the outbounds array
+        // Display the result with proper formatting
+        const preview = document.getElementById('preview');
+        const formattedJson = formatJsonWithSyntaxHighlighting(config);
+        
+        preview.innerHTML = formattedJson;
+        preview.className = 'preview-content';
+        
+        // Show copy button
+        document.getElementById('copyBtn').style.display = 'flex';
+        
+        updateStatus('success', 'Configuration ready');
+        
+      } catch (error) {
+        showError('Error generating configuration: ' + error.message);
+        updateStatus('error', 'Generation failed');
+      }
+    }
+
+    function copyToClipboard() {
+      const preview = document.getElementById('preview');
+      const text = preview.textContent || preview.innerText;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showSuccess('Configuration copied to clipboard!');
+        }).catch(() => {
+          fallbackCopyTextToClipboard(text);
+        });
+      } else {
+        fallbackCopyTextToClipboard(text);
+      }
+    }
+
+    function formatJsonWithSyntaxHighlighting(obj) {
+      const jsonString = JSON.stringify(obj, null, 2);
+      
+      // Apply syntax highlighting
+      return jsonString
+        .replace(/(".*?")(\s*:\s*)/g, '<span class="json-key">$1</span>$2')
+        .replace(/:\s*(".*?")/g, ': <span class="json-string">$1</span>')
+        .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+        .replace(/:\s*(true|false)/g, ': <span class="json-boolean">$1</span>')
+        .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showSuccess('Configuration copied to clipboard!');
+      } catch (err) {
+        showError('Failed to copy to clipboard');
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    function resetFileDisplay(display, text) {
+      display.classList.remove('has-file');
+      display.querySelector('.file-text').textContent = text;
+      display.querySelector('.file-icon').className = 'fas fa-file-code file-icon';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function updateStatus(type, message) {
+      const indicator = document.getElementById('statusIndicator');
+      indicator.className = `status-indicator status-${type}`;
+      
+      const icons = {
+        pending: 'fas fa-clock',
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-triangle'
+      };
+      
+      indicator.innerHTML = `<i class="${icons[type]}"></i> ${message}`;
+    }
+
+    function showError(message) {
+      // You can replace this with a more sophisticated notification system
+      alert('Error: ' + message);
+    }
+
+    function showSuccess(message) {
+      // You can replace this with a more sophisticated notification system
+      alert('Success: ' + message);
+    }
+  </script>
+</body>
+</html>
