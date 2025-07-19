@@ -1,0 +1,34 @@
+// Only add routing if we're in "custom" mode
+        if (routingMode === 'custom') {
+          // Ensure routing exists
+          config.routing = config.routing || {};
+          config.routing.rules = config.routing.rules || [];
+          
+          // Get custom domains
+          const customDomains = document.getElementById('customDomains').value
+            .split('\n')
+            .map(domain => domain.trim())
+            .filter(domain => domain.length > 0);
+          
+          // Only create routing rule if we have custom domains
+          if (customDomains.length > 0) {
+            const baseDomains = [
+              "geosite:openai",
+              "geosite:google", 
+              "geosite:netflix",
+              "openai.com",
+              "spotify.com"
+            ];
+            
+            const rule = {
+              type: "field",
+              domain: [...baseDomains, ...customDomains],
+              outboundTag: "warp"
+            };
+            
+            // Insert routing rule at the beginning
+            config.routing.rules.unshift(rule);
+          }
+        }
+        // For "all traffic" mode, no routing rules are added
+        // WARP outbound will be used as default since it's first in the outbounds array
